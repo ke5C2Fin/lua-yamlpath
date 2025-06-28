@@ -7,7 +7,7 @@ local function check_line(line)
 	if line:find('^ *#') then return false end
 	if line:find('^ *%*') then return false end
 	if line:find('^ *%&') then return false end
-    return true
+	return true
 end
 
 local function get_indent(line)
@@ -17,7 +17,7 @@ local function get_indent(line)
 		is_seq = true
 		indent = indent + 2
 	end
-    return indent, is_seq
+	return indent, is_seq
 end
 
 local function get_yaml_key(line)
@@ -51,23 +51,22 @@ vis:map(vis.modes.NORMAL, "<C-p>", function(keys)
 		if not curr_line then return false end
 
 		if check_line(curr_line) then
-            local seq_indicator = ''
-            if is_seq then
-                seq_indicator = '[]'
-            end
+			local seq_indicator = ''
+			if is_seq then
+				seq_indicator = '[]'
+			end
 
-            curr_indent, is_seq = get_indent(curr_line)
-            if curr_indent < trigger_indent then
-                trigger_indent = curr_indent
+			curr_indent, is_seq = get_indent(curr_line)
+			if curr_indent < trigger_indent then
+				trigger_indent = curr_indent
 
-                yaml_key = get_yaml_key(curr_line)
-                if not yaml_key then return false end
-                yaml_path = string.format('%s%s.%s', yaml_key, seq_indicator, yaml_path)
-            end
-        end
+				yaml_key = get_yaml_key(curr_line)
+				if not yaml_key then return false end
+				yaml_path = string.format('%s%s.%s', yaml_key, seq_indicator, yaml_path)
+			end
+		end
 	end
 
 	vis:info(yaml_path)
 	return yaml_path
-
 end, "yaml path")
