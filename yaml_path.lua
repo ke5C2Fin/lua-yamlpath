@@ -43,26 +43,23 @@ vis:map(vis.modes.NORMAL, "<C-p>", function(keys)
 
 	while curr_indent > 1 do
 		line_num = line_num - 1
-		if line_num == 0 then
-			break
-		end
+		if line_num > 0 then
+			curr_line = vis.win.file.lines[line_num]
+			if curr_line and check_line(curr_line) then
+				local seq_indicator = ''
+				if is_seq then
+					seq_indicator = '[]'
+				end
 
-		curr_line = vis.win.file.lines[line_num]
-		if not curr_line then return false end
+				curr_indent, is_seq = get_indent(curr_line)
+				if curr_indent < trigger_indent then
+					trigger_indent = curr_indent
 
-		if check_line(curr_line) then
-			local seq_indicator = ''
-			if is_seq then
-				seq_indicator = '[]'
-			end
-
-			curr_indent, is_seq = get_indent(curr_line)
-			if curr_indent < trigger_indent then
-				trigger_indent = curr_indent
-
-				yaml_key = get_yaml_key(curr_line)
-				if not yaml_key then return false end
-				yaml_path = string.format('%s%s.%s', yaml_key, seq_indicator, yaml_path)
+					yaml_key = get_yaml_key(curr_line)
+					if yaml_key then
+						yaml_path = string.format('%s%s.%s', yaml_key, seq_indicator, yaml_path)
+					end
+				end
 			end
 		end
 	end
