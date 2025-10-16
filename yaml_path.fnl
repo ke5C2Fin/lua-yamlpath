@@ -12,7 +12,12 @@
     (let [real_indent (if is-seq
                         (+ indent 2)
                         indent)]
-      (values indent is-seq))))
+      (values real_indent is-seq))))
+
+(fn get-seq-indicator [line]
+  (let seq-indicator (if is-seq (line)
+                       ("[]")
+                     ("")
 
 (fn get-yaml-key [line]
   (let [key (line:match "^ *-? *([^ ]+):")]
@@ -30,7 +35,7 @@
     (var yaml-path "")
 
     (when (check-line curr-line)
-      (var (curr-indent is-seq) (get-indent curr-line))
+      (var curr-indent (get-indent curr-line))
       (var trigger-indent curr-indent)
       (var yaml-key (get-yaml-key curr-line))
       (when yaml-key
@@ -41,14 +46,12 @@
             (set curr-line (. vis.win.file.lines line-num))
             (when curr-line
               (when (check-line curr-line)
-                (var seq-indicator "")
-                (when is-seq
-                  (set seq-indicator "[]"))
-                (set (curr-indent is-seq) (get-indent curr-line))
+                (set curr-indent (get-indent curr-line))
                 (when (< curr-indent trigger-indent)
                   (set trigger-indent curr-indent)
                   (set yaml-key (get-yaml-key curr-line))
                   (when yaml-key
+                    (set seq-indicator (get-seq-indicator curr-line))
                     (set yaml-path (string.format "%s%s.%s" yaml-key seq-indicator yaml-path))))))))))
     (vis:info yaml-path)
     yaml-path)
